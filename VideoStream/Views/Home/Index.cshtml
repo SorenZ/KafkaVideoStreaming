@@ -1,0 +1,80 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Video Streaming</title>
+    @*<link href="//vjs.zencdn.net/7.3.0/video-js.min.css" rel="stylesheet">
+    <script src="//vjs.zencdn.net/7.3.0/video.min.js"></script>*@
+</head>
+<body>
+    <div>
+        @*<video id="my-player"
+           class="video-js"
+           controls
+           preload="auto"
+           poster="//vjs.zencdn.net/v/oceans.png"
+           data-setup='{}'>
+        <source src="http://localhost:5000/api/video/GetLive" type="video/mp4"></source>
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a
+            web browser that
+            <a href="https://videojs.com/html5-video-support/" target="_blank">
+                supports HTML5 video
+            </a>
+        </p>
+        </video>*@
+
+        <video controls></video>
+        <script>
+            var video = document.querySelector('video');
+
+            //var assetURL = 'frag_bunny.mp4';
+            //var assetURL = 'https://raw.githubusercontent.com/nickdesaulniers/netfix/gh-pages/demo/frag_bunny.mp4';
+            var assetURL = 'http://localhost:5000/api/video/GetStaticFile';
+            // Need to be specific for Blink regarding codecs
+            // ./mp4info frag_bunny.mp4 | grep Codec
+            var mimeCodec = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+
+            //video.appendBytes();
+
+            if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
+                var mediaSource = new MediaSource;
+                //console.log(mediaSource.readyState); // closed
+                video.src = URL.createObjectURL(mediaSource);
+                mediaSource.addEventListener('sourceopen', sourceOpen);
+            } else {
+                console.error('Unsupported MIME type or codec: ', mimeCodec);
+            }
+
+            function sourceOpen(_) {
+                //console.log(this.readyState); // open
+                var mediaSource = this;
+                var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
+                fetchAB(assetURL, function (buf) {
+                    sourceBuffer.addEventListener('updateend', function (_) {
+                        mediaSource.endOfStream();
+                        video.play();
+                        console.log(mediaSource.readyState); // ended
+                    });
+                    sourceBuffer.appendBuffer(buf);
+                });
+            };
+
+            function fetchAB(url, cb) {
+                console.log(url);
+                var xhr = new XMLHttpRequest;
+                xhr.open('get', url);
+                xhr.responseType = 'arraybuffer';
+                xhr.onload = function () {
+                    cb(xhr.response);
+                };
+                xhr.send();
+            };
+        </script>
+    </div>
+</body>
+</html>

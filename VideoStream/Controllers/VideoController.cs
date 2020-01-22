@@ -145,7 +145,6 @@ namespace VideoStream.Controllers
                             Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}");
                             await Response.WriteAsync($"Received message at {consumeResult.TopicPartitionOffset}");
                             //await Response.Body.WriteAsync(consumeResult.Value,0,consumeResult.Value.Length);
-                            await Response.Body.FlushAsync();
                             //if (consumeResult.Offset % 1024 == 0)
                             //{
                             //    writer.Flush();
@@ -175,15 +174,14 @@ namespace VideoStream.Controllers
             await GetVideo(stream);
         }
 
-
+        [HttpGet]
         public async Task GetFile()
         {
-            //Response.ContentType = "video/mp4";
-            Response.ContentType = "html/text";
+            Response.ContentType = "video/mp4";
             Response.StatusCode = 200;
 
             //using (var inFileSteam = new FileStream(@"D:\Training\Kafka\WintellectNOW Architecting Distributed Cloud Applications Part 3 Messaging.mp4", FileMode.Open, FileAccess.Read))
-            using (var inFileSteam = new FileStream(@"D:\Downloads\Telegram Desktop\VID-20191016-WA0002.mp4", FileMode.Open, FileAccess.Read))
+            using (var inFileSteam = new FileStream(@"D:\Downloads\Telegram Desktop\4_5916713729692532976.mp4", FileMode.Open, FileAccess.Read))
             {
                 byte[] buffer = new byte[1024]; // 5MB in bytes is 5 * 2^20
                 int bytesRead = inFileSteam.Read(buffer, 0, buffer.Length);
@@ -193,14 +191,23 @@ namespace VideoStream.Controllers
                     await Response.Body.WriteAsync(buffer, 0, buffer.Length);
                     await Response.Body.FlushAsync();
 
-                    await Task.Delay(1);
+                    //await Task.Delay(1);
 
                     bytesRead = inFileSteam.Read(buffer, 0, buffer.Length);
                 }
+                Response.Body.Close();
 
                 inFileSteam.Close();
             }
 
+        }
+
+        [HttpGet]
+        public FileResult GetStaticFile()
+        {
+            var inFileSteam = new FileStream(@"D:\Downloads\Telegram Desktop\4_5916713729692532976.mp4", FileMode.Open,
+                FileAccess.Read);
+            return File(inFileSteam, "video/mp4");
         }
 
         [HttpGet]

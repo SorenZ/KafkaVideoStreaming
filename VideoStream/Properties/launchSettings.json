@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "Project",
       "launchBrowser": false,
-      "launchUrl": "api/upload",
+      "launchUrl": "Home/Index",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -20,7 +20,7 @@
     "VideoStream": {
       "commandName": "Project",
       "launchBrowser": false,
-      "launchUrl": "api/upload",
+      "launchUrl": "Home/Index",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
